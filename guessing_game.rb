@@ -44,14 +44,16 @@ crystal = %q{
                 (_______)
 }
 
+
+# Introduction
 puts crystal
 puts "           NUMBER GUESSING GAME"
 puts "            Let's play a game."
 puts "  Let's guess a number between 1 and 100"
 puts "         There shall be 5 guesses.\n\n"
 
-# Determine which mode to play
 
+# Determine which mode to play
 print "Who should guess the number? The computer or human?: "
 compguessresponse = gets.chomp!
 compguess = false
@@ -64,9 +66,12 @@ else
   leave("Not a valid response")
 end
 
-### COMPUTER GUESSING MODE
-# Setup
+
+###
+### HUMAN GUESSING MODE
+###
 guesses = []
+guessnum = guesses.length+1
 closest_high_guess = 100
 closest_low_guess = 1
 themagicnumber = (1..100).to_a.sample
@@ -77,9 +82,10 @@ if !compguess
     if guesses.length == 5
       leave("You lose! The number was #{themagicnumber}")
     end
-    guessnum = guesses.length+1
+
     print "Your #{guessnum.ordinalize} guess: "
     guess = gets.chomp!
+
 
     if guess_right?(guess.to_i, themagicnumber)
       puts "You win!"
@@ -125,8 +131,66 @@ if !compguess
     end
 
     guesses << guess
+    guessnum = guesses.length + 1
     #puts guesses
   end
 else
-  puts "Not implemented yet"
+###
+### COMPUTER GUESSING MODE
+###
+  puts "When I guess, I need you to tell me if it's"
+  puts "too \"high\", too \"low\", or \"correct\"\n\n"
+  puts "Pick a number. Press enter when you're ready."
+  gets.chomp!
+
+  # Setup
+  correct = false
+  guesspool = (1..100).to_a
+
+  while !correct
+    if guesses.length == 5
+      if guesspool.length == 1
+        leave("I lost, but I know the answer: #{guesspool[0]}")
+      end
+      leave("I lose! Nooooooooooooooooooo")
+    end
+
+    if guesspool.length == 0
+      leave("You LIAR!!!")
+    end
+
+    guess = guesspool.sample
+
+    if guesspool.length < 2
+      puts "I guessed it! I win!"
+      leave("The the correct number was #{guesspool[0]}")
+    end
+
+    puts "My #{guessnum.ordinalize} guess: #{guess}"
+    print "Am I correct, high, or low?: "
+    response = gets.chomp!
+    if (response == "low" && guess == 100) || (response == "high" && guess == 1)
+      puts "Stop playin' with me"
+      next
+    end
+
+    case response
+    when "high"
+      guesspool.delete_if { |n| n > guess }
+      guesses << guess
+    when "low"
+      guesspool.delete_if { |n| n < guess }
+      guesses << guess
+    when "correct"
+      puts "Suck it."
+      correct = true
+    else
+      puts "What? You sassin' me?"
+    end
+
+    guesspool.delete(guess)
+    guessnum = guesses.length + 1
+
+  end
+
 end
