@@ -46,7 +46,7 @@ crystal += "                (_______)\e[0m\n"
 
 # Introduction
 puts crystal
-puts "           NUMBER GUESSING GAME"
+puts "           \e[1mNUMBER GUESSING GAME\e[0m"
 puts "            Let's play a game."
 puts "  Let's guess a number between 1 and 100"
 puts "         There shall be 5 guesses.\n\n"
@@ -85,8 +85,9 @@ if !comp_guess
     end
 
     # Collect guess from user
-    print "Your #{guess_num.ordinalize} guess: "
+    print "Your #{guess_num.ordinalize} guess: \e[1m"
     guess = gets.chomp!
+    print "\e[0m"
 
     # Check if guess is empty
     if guess == ""
@@ -116,7 +117,7 @@ if !comp_guess
 
     # Check if guess was already guessed.
     if guesses.include? guess
-      puts "\e[91mDawg, take some ginko. Try again.\e[0m"
+      puts "\e[91mDawg, take some ginkgo biloba. Try again.\e[0m"
       puts "Here are your guesses so far: #{guesses}"
       next
     end
