@@ -15,6 +15,21 @@ def is_integer?(n)
   return false
 end
 
+class Fixnum
+  def ordinalize
+    if (11..13).include?(self % 100)
+      "#{self}th"
+    else
+      case self % 10
+        when 1; "#{self}st"
+        when 2; "#{self}nd"
+        when 3; "#{self}rd"
+        else    "#{self}th"
+      end
+    end
+  end
+end
+
 crystal = %q{
                  _.---._
             *  .'       '.  *
@@ -30,13 +45,15 @@ crystal = %q{
 }
 
 puts crystal
-puts "           NUMBER GUESSING GAME\n\n"
-
+puts "           NUMBER GUESSING GAME"
+puts "            Let's play a game."
+puts "  Let's guess a number between 1 and 100"
+puts "         There shall be 5 guesses.\n\n"
 
 # Determine which mode to play
+
 print "Who should guess the number? The computer or human?: "
 compguessresponse = gets.chomp!
-
 compguess = false
 case compguessresponse
 when "computer"
@@ -58,10 +75,10 @@ if !compguess
   puts ""
   while true
     if guesses.length == 5
-      leave("You lose!")
+      leave("You lose! The number was #{themagicnumber}")
     end
-
-    print "Your guess: "
+    guessnum = guesses.length+1
+    print "Your #{guessnum.ordinalize} guess: "
     guess = gets.chomp!
 
     if guess_right?(guess.to_i, themagicnumber)
