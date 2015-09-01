@@ -53,14 +53,14 @@ puts "         There shall be 5 guesses.\n\n"
 
 
 # Determine which mode to play
-print "Who should guess the number? The \e[0;36mcomputer\e[0m or \e[0;36mhuman\e[0m?: "
-compguessresponse = gets.chomp!
-compguess = false
-case compguessresponse
+print "Who will guess the number? The \e[0;36mcomputer\e[0m or \e[0;36mhuman\e[0m?: "
+comp_guess_response = gets.chomp!
+comp_guess = false
+case comp_guess_response
 when "computer"
-  compguess = true
+  comp_guess = true
 when "human"
-  compguess = false
+  comp_guess = false
 else
   leave("Not a valid response")
 end
@@ -70,50 +70,60 @@ end
 ### HUMAN GUESSING MODE
 ###
 guesses = []
-guessnum = guesses.length+1
+guess_num = guesses.length+1
 closest_high_guess = 100
 closest_low_guess = 1
-themagicnumber = (1..100).to_a.sample
-#puts themagicnumber
-if !compguess
+the_magic_number = (1..100).to_a.sample
+#puts the_magic_number
+if !comp_guess
   puts ""
   while true
+
+    # Check if guess limit was reached
     if guesses.length == 5
-      leave("\e[41mYou lose! The number was #{themagicnumber}\e[0m")
+      leave("\e[41mYou lose! The number was #{the_magic_number}\e[0m")
     end
 
-    print "Your #{guessnum.ordinalize} guess: "
+    # Collect guess from user
+    print "Your #{guess_num.ordinalize} guess: "
     guess = gets.chomp!
 
-
-    if guess_right?(guess.to_i, themagicnumber)
-      puts "\e[42mYou win!\e[0m"
-      break
-    end
-
+    # Check if guess is empty
     if guess == ""
       puts "\e[91mToo scared to play?\e[0m"
       next
     end
 
-    if guess.to_i < 1
-      puts "\e[91mWe're guessing non-zero and positive numbers.\e[0m"
-      next
-    end
-
+    # Check if guess is a whole number.
     if !is_integer?(guess)
       puts "\e[91mDawg, we're guessing whole numbers, not baby names.\e[0m"
       next
     end
 
-    if guesses.include? guess.to_i
+    # Check if guess is something positive and non-zero.
+    if guess.to_i < 1
+      puts "\e[91mWe're guessing non-zero and positive numbers.\e[0m"
+      next
+    end
+
+    # Now we know it's a number. Let's convert it.
+    guess = guess.to_i
+
+    # Check if guess is correct
+    if guess_right?(guess, the_magic_number)
+      leave("\e[42mYou win!\e[0m")
+    end
+
+    # Check if guess was already guessed.
+    if guesses.include? guess
       puts "\e[91mDawg, take some ginko. Try again.\e[0m"
       puts "Here are your guesses so far: #{guesses}"
       next
     end
 
-    guess = guess.to_i
-    if guess > themagicnumber
+    # Guess was wrong, let's tell them if it's too high or low.
+    # We'll also track if the guess was sensible based on previous guesses.
+    if guess > the_magic_number
       puts("\e[91mYou guessed too high.\e[0m")
       if guess > closest_high_guess
         puts "\e[41mWhy did you guess higher?\e[0m"
@@ -129,43 +139,52 @@ if !compguess
       end
     end
 
+    # Track guesses.
     guesses << guess
-    guessnum = guesses.length + 1
-    #puts guesses
+    guess_num = guesses.length + 1
   end
 else
-###
-### COMPUTER GUESSING MODE
-###
+
+
+  ###
+  ### COMPUTER GUESSING MODE
+  ###
+
+  # Introduction
   puts "When I guess, I need you to tell me if it's"
   puts "too \"\e[0;36mhigh\e[0m\", too \"\e[0;36mlow\e[0m\", or \"\e[0;36mcorrect\e[0m\"\n\n"
   puts "Pick a number. Press enter when you're ready."
   gets.chomp!
 
-  # Setup
+  # Setup variables and loop
   correct = false
-  guesspool = (1..100).to_a
-
+  guess_pool = (1..100).to_a
   while !correct
+
+    # Check if guess limit was reached
     if guesses.length == 5
-      if guesspool.length == 1
-        leave("\e[41mI lost, but I know the answer: #{guesspool[0]}\e[0m")
+      if guess_pool.length == 1
+        leave("\e[41mI lost, but I know the answer: #{guess_pool[0]}\e[0m")
       end
       leave("\e[41mI lose! Nooooooooooooooooooo\e[0m")
     end
 
-    if guesspool.length == 0
+    # Check if guess pool is empty, if so imply the user cheated.
+    if guess_pool.length == 0
       leave("\e[41mYou LIAR!!!\e[0m")
     end
 
-    guess = guesspool.sample
+    # Guess a number
+    guess = guess_pool.sample
 
-    if guesspool.length < 2
+    # Check if we've eliminated the possibilities and only have one option left.
+    if guess_pool.length < 2
       puts "\e[42mI guessed it! I win!\e[0m"
-      leave("The the correct number was #{guesspool[0]}")
+      leave("The the correct number was #{guess_pool[0]}")
     end
 
-    puts "My #{guessnum.ordinalize} guess: \e[1m#{guess}\e[0m"
+    # Now that I've guessed, I need to know if I'm right or not.
+    puts "My #{guess_num.ordinalize} guess: \e[1m#{guess}\e[0m"
     print "Am I correct, high, or low?: "
     response = gets.chomp!
     if (response == "low" && guess == 100) || (response == "high" && guess == 1)
@@ -173,22 +192,25 @@ else
       next
     end
 
+    # Based on the response, I'm going to modify my guess pool, and track
+    # the guesses I've made so far.
     case response
     when "high"
-      guesspool.delete_if { |n| n > guess }
+      guess_pool.delete_if { |n| n > guess }
       guesses << guess
     when "low"
-      guesspool.delete_if { |n| n < guess }
+      guess_pool.delete_if { |n| n < guess }
       guesses << guess
     when "correct"
-      puts "\e[41mSuck it.\e[0m"
+      puts "\e[41mComputers rule, humans drool.\e[0m"
       correct = true
     else
       puts "\e[41mWhat? You sassin' me?\e[0m"
     end
 
-    guesspool.delete(guess)
-    guessnum = guesses.length + 1
+    # Remove the guess from the guess pool, and increment my guess count.
+    guess_pool.delete(guess)
+    guess_num = guesses.length + 1
 
   end
 
