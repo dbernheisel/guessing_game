@@ -74,10 +74,11 @@ guess_num = guesses.length+1
 closest_high_guess = 100
 closest_low_guess = 1
 the_magic_number = (1..100).to_a.sample
+correct = false
 #puts the_magic_number
 if !comp_guess
   puts ""
-  while true
+  while !correct
 
     # Check if guess limit was reached
     if guesses.length == 5
@@ -112,7 +113,8 @@ if !comp_guess
 
     # Check if guess is correct
     if guess_right?(guess, the_magic_number)
-      leave("\e[42mYou win!\e[0m")
+      correct = true
+      leave("\e[42mYou win!\e[0m\a")
     end
 
     # Check if guess was already guessed.
@@ -158,15 +160,12 @@ else
   gets.chomp!
 
   # Setup variables and loop
-  correct = false
   guess_pool = (1..100).to_a
   while !correct
 
     # Check if guess limit was reached
     if guesses.length == 5
-      if guess_pool.length == 1
-        leave("\e[41mI lost, but I know the answer: #{guess_pool[0]}\e[0m")
-      end
+      guess_pool.length == 1 ? leave("\e[41mI lost, but I know the answer: #{guess_pool[0]}\e[0m") : nil
       leave("\e[41mI lose! Nooooooooooooooooooo\e[0m")
     end
 
@@ -180,8 +179,8 @@ else
 
     # Check if we've eliminated the possibilities and only have one option left.
     if guess_pool.length < 2
-      puts "\e[42mI guessed it! I win!\e[0m"
-      leave("The the correct number was #{guess_pool[0]}")
+      puts "\e[42mI guessed it! I win!\e[0m\a"
+      leave("The the correct number is #{guess_pool[0]}")
     end
 
     # Now that I've guessed, I need to know if I'm right or not.
@@ -203,7 +202,7 @@ else
       guess_pool.delete_if { |n| n < guess }
       guesses << guess
     when "correct"
-      puts "\e[41mComputers rule, humans drool.\e[0m"
+      puts "\e[42mComputers rule, humans drool.\e[0m"
       correct = true
     else
       puts "\e[41mWhat? You sassin' me?\e[0m"
