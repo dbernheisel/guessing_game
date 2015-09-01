@@ -103,8 +103,8 @@ if !comp_guess
     end
 
     # Check if guess is something positive and non-zero.
-    if guess.to_i < 1
-      puts "\e[91mWe're guessing non-zero and positive numbers.\e[0m"
+    if guess.to_i < 1 || guess.to_i > 101
+      puts "\e[91mWe're guessing non-zero and positive numbers between 1 and 100\e[0m"
       next
     end
 
