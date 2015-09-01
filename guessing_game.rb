@@ -50,10 +50,12 @@ end
 ### COMPUTER GUESSING MODE
 # Setup
 guesses = []
-sensible_guesses = []
+closest_high_guess = 100
+closest_low_guess = 1
 themagicnumber = (1..100).to_a.sample
 #puts themagicnumber
 if !compguess
+  puts ""
   while true
     if guesses.length == 5
       leave("You lose!")
@@ -72,33 +74,39 @@ if !compguess
       next
     end
 
+    if guess.to_i < 1
+      puts "We're guessing non-zero and positive numbers"
+      next
+    end
+
     if !is_integer?(guess)
       puts "Dawg, we're guessing whole numbers, not baby names."
       next
     end
 
-    if guesses.include? guess
+    if guesses.include? guess.to_i
       puts "Dawg, take some ginko. Try again."
       puts "Here are your guesses so far: #{guesses}"
       next
     end
 
-    if guess.to_i > themagicnumber
+    guess = guess.to_i
+    if guess > themagicnumber
       puts("You guessed too high.")
+      if guess > closest_high_guess
+        puts "Why did you guess higher?"
+      else
+        closest_high_guess = guess
+      end
     else
       puts("You guessed too low.")
-    end
-
-    if sensible_guesses.length > 0
-      sensible_guesses.each do |n|
-        if (guess > n && themagicnumber > n) || (guess < n && themagicnumber < n)
-          puts "This is a sensible guess"
-          sensible_guesses << guess
-        else
-          puts "This is not a sensible guess"
-        end
+      if guess < closest_low_guess
+        puts "Why did you guess lower?"
+      else
+        closest_low_guess = guess
       end
     end
+
     guesses << guess
     #puts guesses
   end
